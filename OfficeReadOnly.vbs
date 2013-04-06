@@ -22,6 +22,7 @@ WScript.Quit
 Class OfficeReadOnly
     'Variables
     Private fsObj           'FileSystemObject
+    Private shObj           'Shell
     Private mWordObj        'Word
     Private mExcelObj       'Excel
     Private mPowerPointObj  'Power Point
@@ -30,6 +31,7 @@ Class OfficeReadOnly
     'Initializer
     Private Sub Class_Initialize
         Set fsObj = WScript.CreateObject("Scripting.FileSystemObject")
+        Set shObj = WScript.CreateObject("WScript.Shell")
         Set mWordObj = Nothing
         Set mExcelObj = Nothing
         Set mPowerPointObj = Nothing
@@ -40,6 +42,7 @@ Class OfficeReadOnly
     Private Sub Class_Terminate
         'Release objects
         Set fsObj = Nothing
+        Set shObj = Nothing
         Set mWordObj = Nothing
         Set mExcelObj = Nothing
         Set mPowerPointObj = Nothing
@@ -92,25 +95,30 @@ Class OfficeReadOnly
         Set visioObj = mVisioObj
     End Property
     'Open procedure's
-	Private Sub OpenWithWord(fullFileName)
-		wordObj.Visible = True
-		wordObj.Documents.Open fullFileName, , True
-	End Sub
-	Private Sub OpenWithExcel(fullFileName)
-		excelObj.Visible = True
-		excelObj.Workbooks.Open fullFileName, , True
-	End Sub
-	Private Sub OpenWithPowerPoint(fullFileName)
-		powerPointObj.Visible = True
-		powerPointObj.Presentations.Open fullFileName, True
-	End Sub
-	Private Sub OpenWithProject(fullFileName)
-		projectObj.Visible = True
-		projectObj.FileOpen fullFileName, True
-	End Sub
-	Private Sub OpenWithVisio(fullFileName)
-		visioObj.Documents.OpenEx fullFileName, visOpenRO
-	End Sub
+    Private Sub OpenWithWord(fullFileName)
+        wordObj.Visible = True
+        wordObj.Documents.Open fullFileName, , True
+        shObj.AppActivate  wordObj.Caption
+    End Sub
+    Private Sub OpenWithExcel(fullFileName)
+        excelObj.Visible = True
+        excelObj.Workbooks.Open fullFileName, , True
+        shObj.AppActivate  excelObj.Caption
+    End Sub
+    Private Sub OpenWithPowerPoint(fullFileName)
+        powerPointObj.Visible = True
+        powerPointObj.Presentations.Open fullFileName, True
+        shObj.AppActivate  powerPointObj.Caption
+    End Sub
+    Private Sub OpenWithProject(fullFileName)
+        projectObj.Visible = True
+        projectObj.FileOpen fullFileName, True
+        shObj.AppActivate  projectObj.Caption
+    End Sub
+    Private Sub OpenWithVisio(fullFileName)
+        visioObj.Documents.OpenEx fullFileName, visOpenRO
+        shObj.AppActivate  visioObj.Caption
+    End Sub
     'Usage
     Private Sub Usage
         WScript.Echo(   "OfficeReadOnly"                                    & vbCrLf _
@@ -135,25 +143,25 @@ Class OfficeReadOnly
             Exit Sub
         End If
         'Process each files.
-		For Each fullFileName In Arguments
-			'Extract the filename extension
-			fileName = fsObj.GetFileName(fullFileName)
-			fileExt = LCase(fsObj.GetExtensionName(fullFileName))
-			'Determine the file type
-			Select Case fileExt
-			Case "doc", "docx", "docm"
-				OpenWithWord fullFileName
-			Case "xls", "xlsx", "xlsm"
-				OpenWithExcel fullFileName
-			Case "ppt", "pptx", "pptm"
-				OpenWithPowerPoint fullFileName
-			Case "vsd"
-				OpenWithVisio fullFileName
-			Case "mpp"
-				OpenWithProject fullFileName
-			Case Else
+        For Each fullFileName In Arguments
+            'Extract the filename extension
+            fileName = fsObj.GetFileName(fullFileName)
+            fileExt = LCase(fsObj.GetExtensionName(fullFileName))
+            'Determine the file type
+            Select Case fileExt
+            Case "doc", "docx", "docm"
+                OpenWithWord fullFileName
+            Case "xls", "xlsx", "xlsm"
+                OpenWithExcel fullFileName
+            Case "ppt", "pptx", "pptm"
+                OpenWithPowerPoint fullFileName
+            Case "vsd"
+                OpenWithVisio fullFileName
+            Case "mpp"
+                OpenWithProject fullFileName
+            Case Else
                 'Skip unsupported files
-			End Select
-		Next
-	End Sub
+            End Select
+        Next
+    End Sub
 End Class
