@@ -16,6 +16,7 @@ Option Explicit
 Dim officeReadOnlyAppl
 Set officeReadOnlyAppl = New OfficeReadOnly
 officeReadOnlyAppl.Main WScript.Arguments
+Set officeReadOnlyAppl = Nothing
 WScript.Quit
 
 'Main application class
